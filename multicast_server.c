@@ -1,19 +1,18 @@
 /* multicast_server.c
- * This sample demonstrates a Windows multicast server that works with either
+ * This sample demonstrates a Linux multicast server that works with either
  * IPv4 or IPv6, depending on the multicast address given.
- * Requires Windows XP+/Use MSVC and platform SDK to compile.
- * Troubleshoot: Make sure you have the IPv6 stack installed by running
- *     >ipv6 install
  *
  * Usage:
- *     multicast_server multicastip port data [ttl]
+ *     mcasts multicastip port data [ttl]
  *
  * Examples:
- *     >multicast_server 224.0.22.1 9210 HelloIPv4World
- *     >multicast_server ff15::1 2001 HelloIPv6World
+ *     $ mcasts 224.0.22.1 9210 HelloIPv4World
+ *     $ mcasts ff15::1 2001 HelloIPv6World
  *
  * Written by tmouse, July 2005
  * http://cboard.cprogramming.com/showthread.php?t=67469
+ *
+ * Ported to Linux/BSD by Matthieu Herrb, December 2012
  */
 
 #include <sys/types.h>

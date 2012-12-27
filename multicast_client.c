@@ -1,19 +1,18 @@
 /* multicast_client.c
- * This sample demonstrates a Windows multicast client that works with either
+ * This sample demonstrates a Linux multicast client that works with either
  * IPv4 or IPv6, depending on the multicast address given.
- * Requires Windows XP+/Use MSVC and platform SDK to compile.
- * Troubleshoot: Make sure you have the IPv6 stack installed by running
- *     >ipv6 install
  *
  * Usage:
- *     multicast_client multicastip port
+ *     mcastc multicastip port
  *
  * Examples:
- *     >multicast_client 224.0.22.1 9210
- *     >multicast_client ff15::1 2001
+ *     $ mcastc 224.0.22.1 9210
+ *     $ mcastc ff15::1 2001
  *
  * Written by tmouse, July 2005
  * http://cboard.cprogramming.com/showthread.php?t=67469
+ *
+ * Ported to Linux/BSD by Matthieu Herrb, December 2012
  */
  
 #include <sys/types.h>

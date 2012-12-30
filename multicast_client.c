@@ -81,8 +81,8 @@ main(int argc, char* argv[])
 		/* Specify the multicast group */
 		memcpy(&multicastRequest.imr_multiaddr,
 		    &((struct sockaddr_in*)(multicastAddr->ai_addr))->sin_addr,
-		    sizeof(multicastRequest.imr_multiaddr));
-		
+		    sizeof(struct in_addr));
+
 		/* Accept multicast from any interface */
 		multicastRequest.imr_interface.s_addr = htonl(INADDR_ANY);
 	
@@ -100,7 +100,7 @@ main(int argc, char* argv[])
 		/* Specify the multicast group */
 		memcpy(&multicastRequest.ipv6mr_multiaddr,
 		    &((struct sockaddr_in6*)(multicastAddr->ai_addr))->sin6_addr,
-		    sizeof(multicastRequest.ipv6mr_multiaddr));
+		    sizeof(struct in6_addr));
 
 		/* Accept multicast from any interface */
 		multicastRequest.ipv6mr_interface = 0;

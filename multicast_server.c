@@ -25,7 +25,7 @@
 #include <string.h>
 #include <unistd.h>
 
-int 
+int
 main(int argc, char *argv[])
 {
 	int sock;                   /* Socket */
@@ -47,7 +47,7 @@ main(int argc, char *argv[])
 	sendString = argv[3];	/* Third arg:   String to multicast */
        /* Fourth arg:  If supplied, use command-line */
 	/* specified TTL, else use default TTL of 1 */
-	multicastTTL = (argc == 5 ? atoi(argv[4]) : 1); 
+	multicastTTL = (argc == 5 ? atoi(argv[4]) : 1);
 	sendStringLen = strlen(sendString);
 
 	/* Resolve destination address for multicast datagrams */
@@ -57,7 +57,7 @@ main(int argc, char *argv[])
 	if (getaddrinfo(multicastIP, multicastPort, &hints, &multicastAddr) != 0)
 		err(2, "getaddrinfo() failed");
 
-	printf("Using %s\n", multicastAddr->ai_family == PF_INET6 ? 
+	printf("Using %s\n", multicastAddr->ai_family == PF_INET6 ?
 	    "IPv6" : "IPv4");
 
 	/* Create socket for sending multicast datagrams */
@@ -68,19 +68,19 @@ main(int argc, char *argv[])
 	/* Set TTL of multicast packet */
 	if (setsockopt(sock,
 		multicastAddr->ai_family == PF_INET6 ? IPPROTO_IPV6 : IPPROTO_IP,
-		multicastAddr->ai_family == PF_INET6 ? IPV6_MULTICAST_HOPS 
+		multicastAddr->ai_family == PF_INET6 ? IPV6_MULTICAST_HOPS
 		: IP_MULTICAST_TTL,
 		(char*) &multicastTTL, sizeof(multicastTTL)) != 0)
 		err(2, "setsockopt() failed");
 
 	for (;;) {
 		if (sendto(sock, sendString, sendStringLen, 0,
-			multicastAddr->ai_addr, multicastAddr->ai_addrlen) 
+			multicastAddr->ai_addr, multicastAddr->ai_addrlen)
 		    != sendStringLen )
 			err(2, "sendto() failed");
-        
 
-		usleep(3000000); /* Multicast sendString in datagram to 
+
+		usleep(3000000); /* Multicast sendString in datagram to
 				    clients every 3 seconds */
 	}
 

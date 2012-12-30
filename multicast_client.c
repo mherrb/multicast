@@ -14,7 +14,7 @@
  *
  * Ported to Linux/BSD by Matthieu Herrb, December 2012
  */
- 
+
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
@@ -26,7 +26,7 @@
 #include <time.h>
 #include <unistd.h>
 
-int 
+int
 main(int argc, char* argv[])
 {
 	int sock;		/* Socket */
@@ -39,20 +39,20 @@ main(int argc, char* argv[])
 
 	if (argc != 3)
 		errx(2, "Usage: %s <Multicast IP> <Multicast Port>", argv[0]);
-	
-	multicastIP   = argv[1];      /* First arg:  Multicast IP address */
-	multicastPort = argv[2];      /* Second arg: Multicast port */
-	
+
+	multicastIP = argv[1];	/* First arg:  Multicast IP address */
+	multicastPort = argv[2]; /* Second arg: Multicast port */
+
 	/* Resolve the multicast group address */
 	hints.ai_family = PF_UNSPEC;
 	hints.ai_flags  = AI_NUMERICHOST;
 	if (getaddrinfo(multicastIP, NULL, &hints, &multicastAddr) != 0 )
 		errx(2, "getaddrinfo() failed");
-	
-	printf("Using %s\n", multicastAddr->ai_family == PF_INET6 ? 
+
+	printf("Using %s\n", multicastAddr->ai_family == PF_INET6 ?
 	    "IPv6" : "IPv4");
 
-	/* Get a local address with the same family (IPv4 or IPv6) 
+	/* Get a local address with the same family (IPv4 or IPv6)
 	   as our multicast group */
 	hints.ai_family   = multicastAddr->ai_family;
 	hints.ai_socktype = SOCK_DGRAM;
@@ -61,7 +61,7 @@ main(int argc, char* argv[])
 		errx(2, "getaddrinfo() failed");
 
 	/* Create socket for receiving datagrams */
-	if ((sock = socket(localAddr->ai_family, 
+	if ((sock = socket(localAddr->ai_family,
 		    localAddr->ai_socktype, 0)) == -1)
 		err(2, "socket() failed");
 
@@ -71,11 +71,10 @@ main(int argc, char* argv[])
 
 	/* Join the multicast group. We do this seperately depending on whether we
 	 * are using IPv4 or IPv6.  */
-	if (multicastAddr->ai_family  == PF_INET &&  
+	if (multicastAddr->ai_family  == PF_INET &&
 	    multicastAddr->ai_addrlen == sizeof(struct sockaddr_in)) {
 		/* IPv4 */
-    
-		struct ip_mreq multicastRequest;  /* Multicast address 
+		struct ip_mreq multicastRequest;  /* Multicast address
 						     join structure */
 
 		/* Specify the multicast group */
@@ -85,16 +84,16 @@ main(int argc, char* argv[])
 
 		/* Accept multicast from any interface */
 		multicastRequest.imr_interface.s_addr = htonl(INADDR_ANY);
-	
+
 		/* Join the multicast address */
-		if (setsockopt(sock, IPPROTO_IP, IP_ADD_MEMBERSHIP, 
-			(char *)&multicastRequest, sizeof(multicastRequest)) 
+		if (setsockopt(sock, IPPROTO_IP, IP_ADD_MEMBERSHIP,
+			(char *)&multicastRequest, sizeof(multicastRequest))
 		    != 0 )
 			err(2, "setsockopt() failed");
 	} else if (multicastAddr->ai_family  == PF_INET6 &&
 	    multicastAddr->ai_addrlen == sizeof(struct sockaddr_in6)) {
 		/* IPv6 */
-		struct ipv6_mreq multicastRequest;  /* Multicast address 
+		struct ipv6_mreq multicastRequest;  /* Multicast address
 						       join structure */
 
 		/* Specify the multicast group */
@@ -104,9 +103,9 @@ main(int argc, char* argv[])
 
 		/* Accept multicast from any interface */
 		multicastRequest.ipv6mr_interface = 0;
-		
-		/* Join the multicast address */
-		if (setsockopt(sock, IPPROTO_IPV6, IPV6_JOIN_GROUP, 
+
+		/* Join the multicast group */
+		if (setsockopt(sock, IPPROTO_IPV6, IPV6_JOIN_GROUP,
 			(char *) &multicastRequest, sizeof(multicastRequest))
 		    != 0)
 			err(2, "setsockopt() failed");
@@ -123,12 +122,12 @@ main(int argc, char* argv[])
 		int    recvStringLen;        /* Length of received string */
 
 		/* Receive a single datagram from the server */
-		if ((recvStringLen = recvfrom(sock, recvString, 
+		if ((recvStringLen = recvfrom(sock, recvString,
 			    sizeof(recvString) - 1, 0, NULL, 0)) < 0 )
 			err(2, "recvfrom() failed");
-		
+
 		recvString[recvStringLen] = '\0';
-		
+
 		/* Print the received string */
 		time(&timer);  /* get time stamp to print with recieved data */
 		printf("Time Received: %s : %s\n", ctime(&timer), recvString);

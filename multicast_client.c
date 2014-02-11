@@ -1,6 +1,6 @@
 /*
  * multicast_client.c
- * 
+ *
  * Derived from :
  *
  * This sample demonstrates a Windows multicast client that works with either

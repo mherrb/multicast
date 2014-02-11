@@ -1,6 +1,6 @@
 /*
  * multicast_server.c
- * 
+ *
  * This sample demonstrates a Linux multicast server that works with either
  * IPv4 or IPv6, depending on the multicast address given.
  *
@@ -56,7 +56,7 @@ main(int argc, char *argv[])
 	hints.ai_family   = PF_UNSPEC;
 	hints.ai_socktype = SOCK_DGRAM;
 	hints.ai_flags    = AI_NUMERICHOST;
-	if (getaddrinfo(multicastIP, multicastPort, 
+	if (getaddrinfo(multicastIP, multicastPort,
 		&hints, &multicastAddr) != 0)
 		err(2, "getaddrinfo() failed");
 

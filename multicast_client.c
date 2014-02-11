@@ -1,5 +1,9 @@
-/* multicast_client.c
- * This sample demonstrates a Linux multicast client that works with either
+/*
+ * multicast_client.c
+ * 
+ * Derived from :
+ *
+ * This sample demonstrates a Windows multicast client that works with either
  * IPv4 or IPv6, depending on the multicast address given.
  *
  * Usage:

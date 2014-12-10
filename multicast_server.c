@@ -17,6 +17,8 @@
  * Ported to Linux/BSD by Matthieu Herrb, December 2012
  */
 
+#define _GNU_SOURCE		/* for asprintf() */
+
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
@@ -26,6 +28,7 @@
 #include <stdio.h>      /* for fprintf() */
 #include <stdlib.h>     /* for atoi() and exit() */
 #include <string.h>
+#include <time.h>
 #include <unistd.h>
 
 #ifdef HAVE_LIBBSD
@@ -106,11 +109,20 @@ main(int argc, char *argv[])
 		err(2, "setsockopt() failed");
 
 	for (;;) {
-		if (sendto(sock, sendString, sendStringLen, 0,
+		struct timespec tv;
+		char *buffer;
+
+		clock_gettime(CLOCK_REALTIME, &tv);
+		sendStringLen = asprintf(&buffer, "%ld.%.09ld %s",
+		    tv.tv_sec, tv.tv_nsec, sendString);
+		if (sendStringLen < 0)
+			err(2, "asprintf");
+		sendStringLen++; /* nul byte */
+		if (sendto(sock, buffer, sendStringLen, 0,
 			multicastAddr->ai_addr, multicastAddr->ai_addrlen)
 		    != sendStringLen )
 			err(2, "sendto() failed");
-
+		free(buffer);
 
 		usleep(interval*1000); /* Multicast sendString in datagram to
 					  clients every interval ms */

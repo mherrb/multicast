@@ -131,7 +131,7 @@ main(int argc, char* argv[])
 	freeaddrinfo(multicastAddr);
 
 	for (;;) {
-		time_t timer;
+		struct timespec tv;
 		char   recvString[500];      /* Buffer for received string */
 		int    recvStringLen;        /* Length of received string */
 
@@ -143,8 +143,9 @@ main(int argc, char* argv[])
 		recvString[recvStringLen] = '\0';
 
 		/* Print the received string */
-		time(&timer);  /* get time stamp to print with recieved data */
-		printf("Time Received: %s : %s\n", ctime(&timer), recvString);
+		clock_gettime(CLOCK_REALTIME, &tv);
+		printf("%ld.%09ld %s\n", tv.tv_sec, tv.tv_nsec,
+		    recvString);
 	}
 
 	/* NOT REACHED */

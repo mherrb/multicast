@@ -30,6 +30,13 @@
 #include <time.h>
 #include <unistd.h>
 
+void
+usage(const char *name)
+{
+	errx(2, "Usage: %s [-i interval] <Multicast IP> <Multicast Port>",
+	    name);
+}
+
 int
 main(int argc, char* argv[])
 {
@@ -40,9 +47,8 @@ main(int argc, char* argv[])
 	struct addrinfo *localAddr;	/* Local address to bind to */
 	struct addrinfo hints = { 0 };	/* Hints for name lookup */
 
-
 	if (argc != 3)
-		errx(2, "Usage: %s <Multicast IP> <Multicast Port>", argv[0]);
+		usage(argv[0]);
 
 	multicastIP = argv[1];	/* First arg:  Multicast IP address */
 	multicastPort = argv[2]; /* Second arg: Multicast port */

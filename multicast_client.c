@@ -41,6 +41,7 @@ int
 main(int argc, char* argv[])
 {
 	int sock;		/* Socket */
+	int result;
 	char *multicastIP;	/* Arg: IP Multicast Address */
 	char *multicastPort;	/* Arg: Port */
 	struct addrinfo *multicastAddr;	/* Multicast Address */
@@ -56,8 +57,10 @@ main(int argc, char* argv[])
 	/* Resolve the multicast group address */
 	hints.ai_family = PF_UNSPEC;
 	hints.ai_flags  = AI_NUMERICHOST;
-	if (getaddrinfo(multicastIP, NULL, &hints, &multicastAddr) != 0 )
-		errx(2, "getaddrinfo() failed");
+	result = getaddrinfo(multicastIP, NULL, &hints, &multicastAddr);
+	if (result != 0)
+		errx(2, "getaddrinfo(%s) failed: %s", multicastIP,
+		    gai_strerror(result));
 
 	printf("Using %s\n", multicastAddr->ai_family == PF_INET6 ?
 	    "IPv6" : "IPv4");
@@ -67,8 +70,9 @@ main(int argc, char* argv[])
 	hints.ai_family   = multicastAddr->ai_family;
 	hints.ai_socktype = SOCK_DGRAM;
 	hints.ai_flags    = AI_PASSIVE; /* Return an address we can bind to */
-	if ( getaddrinfo(NULL, multicastPort, &hints, &localAddr) != 0 )
-		errx(2, "getaddrinfo() failed");
+	result = getaddrinfo(NULL, multicastPort, &hints, &localAddr);
+	if (result != 0)
+		errx(2, "getaddrinfo() failed: %s", gai_strerror(result));
 
 	/* Create socket for receiving datagrams */
 	if ((sock = socket(localAddr->ai_family,

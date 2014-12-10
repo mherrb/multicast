@@ -48,6 +48,7 @@ main(int argc, char *argv[])
 {
 	int sock;		      /* Socket */
 	int ch;
+	int result;
 	unsigned long interval = 3000;
 	const char *errmsg;
 	char *multicastIP;            /* Arg: IP Multicast address */
@@ -88,9 +89,11 @@ main(int argc, char *argv[])
 	hints.ai_family   = PF_UNSPEC;
 	hints.ai_socktype = SOCK_DGRAM;
 	hints.ai_flags    = AI_NUMERICHOST;
-	if (getaddrinfo(multicastIP, multicastPort,
-		&hints, &multicastAddr) != 0)
-		err(2, "getaddrinfo() failed");
+	result = getaddrinfo(multicastIP, multicastPort,
+	    &hints, &multicastAddr);
+	if (result != 0)
+		errx(2, "getaddrinfo(%s:%s) failed: %s",
+		    multicastIP, multicastPort, gai_strerror(result));
 
 	printf("Using %s\n", multicastAddr->ai_family == PF_INET6 ?
 	    "IPv6" : "IPv4");

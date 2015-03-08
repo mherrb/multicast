@@ -109,7 +109,7 @@ main(int argc, char *argv[])
 		multicastAddr->ai_family == PF_INET6 ? IPV6_MULTICAST_HOPS
 		: IP_MULTICAST_TTL,
 		(char*) &multicastTTL, sizeof(multicastTTL)) != 0)
-		err(2, "setsockopt() failed");
+		err(2, "setsockopt(MULTICAST_TTL/HOPS) failed");
 
 	for (;;) {
 		struct timespec tv;

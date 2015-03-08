@@ -103,7 +103,7 @@ main(int argc, char* argv[])
 		if (setsockopt(sock, IPPROTO_IP, IP_ADD_MEMBERSHIP,
 			(char *)&multicastRequest, sizeof(multicastRequest))
 		    != 0 )
-			err(2, "setsockopt() failed");
+			err(2, "setsockopt(IP_ADD_MEMBERSHIP) failed");
 	} else if (multicastAddr->ai_family  == PF_INET6 &&
 	    multicastAddr->ai_addrlen == sizeof(struct sockaddr_in6)) {
 		/* IPv6 */
@@ -122,7 +122,7 @@ main(int argc, char* argv[])
 		if (setsockopt(sock, IPPROTO_IPV6, IPV6_JOIN_GROUP,
 			(char *) &multicastRequest, sizeof(multicastRequest))
 		    != 0)
-			err(2, "setsockopt() failed");
+			err(2, "setsockopt(IPV6_JOIN_GROUP) failed");
 	} else {
 		errx(2, "Neither IPv4 or IPv6");
 	}

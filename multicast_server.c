@@ -55,7 +55,7 @@ main(int argc, char *argv[])
 	char *multicastPort;          /* Arg: Server port */
 	char *sendString;             /* Arg: String to multicast */
 	int sendStringLen;	      /* Length of string to multicast */
-	u_char multicastTTL;          /* Arg: TTL of multicast packets */
+	int multicastTTL;          /* Arg: TTL of multicast packets */
 	struct addrinfo* multicastAddr;          /* Multicast address */
 	struct addrinfo hints = { 0 }; /* Hints for name lookup */
 
@@ -101,13 +101,17 @@ main(int argc, char *argv[])
 		err(2, "socket() failed");
 
 	/* Set TTL of multicast packet */
-	if (setsockopt(sock,
-		multicastAddr->ai_family == PF_INET6 ? IPPROTO_IPV6 : IPPROTO_IP,
-		multicastAddr->ai_family == PF_INET6 ? IPV6_MULTICAST_HOPS
-		: IP_MULTICAST_TTL,
-		(char*) &multicastTTL, sizeof(multicastTTL)) != 0)
-		err(2, "setsockopt(MULTICAST_TTL/HOPS) failed");
+	if (multicastAddr->ai_family == PF_INET6) {
+		if (setsockopt(sock, IPPROTO_IPV6, IPV6_MULTICAST_HOPS,
+			&multicastTTL, sizeof(multicastTTL)) != 0)
+			err(2, "setsockopt(IPV6_MULTICAST_HOPS) failed");
+	} else {
+		u_char ttl = (u_char)multicastTTL;
 
+		if (setsockopt(sock, IPPROTO_IP, IP_MULTICAST_TTL,
+			&ttl, sizeof(ttl)) != 0)
+			err(2, "setsockopt(IP_MULTICAST_TTL) failed");
+	}
 	for (;;) {
 		struct timespec tv;
 		char *buffer;

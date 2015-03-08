@@ -25,15 +25,11 @@
 #include <err.h>
 #include <limits.h>
 #include <netdb.h>
-#include <stdio.h>      /* for fprintf() */
-#include <stdlib.h>     /* for atoi() and exit() */
+#include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 #include <time.h>
 #include <unistd.h>
-
-#ifdef HAVE_LIBBSD
-# include <bsd/stdlib.h>	/* for strtonum() */
-#endif
 
 void
 usage(const char *name)
@@ -41,7 +37,6 @@ usage(const char *name)
 	errx(2, "Usage: %s [-i interval(ms)] <Multicast Address> <Port> "
 	    "<Send String> [<TTL>]", name);
 }
-
 
 int
 main(int argc, char *argv[])
@@ -62,10 +57,7 @@ main(int argc, char *argv[])
 	while ((ch = getopt(argc, argv, "i:")) != -1) {
 		switch (ch) {
 		case 'i':
-			interval = strtonum(optarg, 0, INT_MAX,
-			    &errmsg);
-			if (errmsg != NULL)
-				err(2, "-i: %s", errmsg);
+			interval = atoi(optarg);
 			break;
 		default:
 			usage(argv[0]);

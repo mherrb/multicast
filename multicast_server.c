@@ -55,7 +55,7 @@ main(int argc, char *argv[])
 	char *multicastPort;          /* Arg: Server port */
 	char *sendString;             /* Arg: String to multicast */
 	size_t sendStringLen;         /* Length of string to multicast */
-	int multicastTTL;             /* Arg: TTL of multicast packets */
+	u_char multicastTTL;          /* Arg: TTL of multicast packets */
 	struct addrinfo* multicastAddr;          /* Multicast address */
 	struct addrinfo hints = { 0 }; /* Hints for name lookup */
 
@@ -81,7 +81,7 @@ main(int argc, char *argv[])
 	multicastIP = argv[0]; /* First arg:   multicast IP address */
 	multicastPort = argv[1]; /* Second arg:  multicast port */
 	sendString = argv[2];	/* Third arg:   String to multicast */
-       /* Fourth arg:  If supplied, use command-line */
+        /* Fourth arg:  If supplied, use command-line */
 	/* specified TTL, else use default TTL of 1 */
 	multicastTTL = (argc == 4 ? atoi(argv[3]) : 1);
 

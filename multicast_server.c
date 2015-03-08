@@ -49,7 +49,7 @@ main(int argc, char *argv[])
 	char *multicastIP;            /* Arg: IP Multicast address */
 	char *multicastPort;          /* Arg: Server port */
 	char *sendString;             /* Arg: String to multicast */
-	size_t sendStringLen;         /* Length of string to multicast */
+	int sendStringLen;	      /* Length of string to multicast */
 	u_char multicastTTL;          /* Arg: TTL of multicast packets */
 	struct addrinfo* multicastAddr;          /* Multicast address */
 	struct addrinfo hints = { 0 }; /* Hints for name lookup */

@@ -29,6 +29,10 @@
 #include <string.h>
 #include <time.h>
 #include <unistd.h>
+#ifdef __MACH__
+#include <mach/clock.h>
+#include <mach/mach.h>
+#endif
 
 void
 usage(const char *name)
@@ -132,6 +136,10 @@ main(int argc, char* argv[])
 
 	for (;;) {
 		struct timespec tv;
+#ifdef __MACH__
+		clock_serv_t cclock;
+		mach_timespec_t mts;
+#endif
 		char   recvString[500];      /* Buffer for received string */
 		int    recvStringLen;        /* Length of received string */
 
@@ -143,7 +151,15 @@ main(int argc, char* argv[])
 		recvString[recvStringLen] = '\0';
 
 		/* Print the received string */
+#ifdef __MACH__
+		host_get_clock_service(mach_host_self(), CALENDAR_CLOCK, &cclock);
+		clock_get_time(cclock, &mts);
+		mach_port_deallocate(mach_task_self(), cclock);
+		tv.tv_sec = mts.tv_sec;
+		tv.tv_nsec = mts.tv_nsec;
+#else
 		clock_gettime(CLOCK_REALTIME, &tv);
+#endif
 		printf("%ld.%09ld %s\n", tv.tv_sec, tv.tv_nsec,
 		    recvString);
 	}

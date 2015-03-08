@@ -31,6 +31,11 @@
 #include <time.h>
 #include <unistd.h>
 
+#ifdef __MACH__
+#include <mach/clock.h>
+#include <mach/mach.h>
+#endif
+
 void
 usage(const char *name)
 {
@@ -73,7 +78,7 @@ main(int argc, char *argv[])
 	multicastIP = argv[0]; /* First arg:   multicast IP address */
 	multicastPort = argv[1]; /* Second arg:  multicast port */
 	sendString = argv[2];	/* Third arg:   String to multicast */
-        /* Fourth arg:  If supplied, use command-line */
+	/* Fourth arg:  If supplied, use command-line */
 	/* specified TTL, else use default TTL of 1 */
 	multicastTTL = (argc == 4 ? atoi(argv[3]) : 1);
 
@@ -106,8 +111,18 @@ main(int argc, char *argv[])
 	for (;;) {
 		struct timespec tv;
 		char *buffer;
+#ifdef __MACH__
+		clock_serv_t cclock;
+		mach_timespec_t mts;
 
+		host_get_clock_service(mach_host_self(), CALENDAR_CLOCK, &cclock);
+		clock_get_time(cclock, &mts);
+		mach_port_deallocate(mach_task_self(), cclock);
+		tv.tv_sec = mts.tv_sec;
+		tv.tv_nsec = mts.tv_nsec;
+#else
 		clock_gettime(CLOCK_REALTIME, &tv);
+#endif
 		sendStringLen = asprintf(&buffer, "%ld.%.09ld %s",
 		    tv.tv_sec, tv.tv_nsec, sendString);
 		if (sendStringLen < 0)

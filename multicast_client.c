@@ -37,8 +37,9 @@
 void
 usage(const char *name)
 {
-	errx(2, "Usage: %s [-i interval] <Multicast IP> <Multicast Port>",
-	    name);
+	fprintf(stderr, "Usage: %s [-i interval] <Multicast IP> "
+	    "<Multicast Port>", name);
+	exit(1);
 }
 
 int
@@ -46,14 +47,16 @@ main(int argc, char* argv[])
 {
 	int sock;		/* Socket */
 	int result;
+	char *progname;
 	char *multicastIP;	/* Arg: IP Multicast Address */
 	char *multicastPort;	/* Arg: Port */
 	struct addrinfo *multicastAddr;	/* Multicast Address */
 	struct addrinfo *localAddr;	/* Local address to bind to */
 	struct addrinfo hints = { 0 };	/* Hints for name lookup */
 
+	progname = argv[0];
 	if (argc != 3)
-		usage(argv[0]);
+		usage(progname);
 
 	multicastIP = argv[1];	/* First arg:  Multicast IP address */
 	multicastPort = argv[2]; /* Second arg: Multicast port */

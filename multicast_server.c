@@ -39,8 +39,9 @@
 void
 usage(const char *name)
 {
-	errx(2, "Usage: %s [-i interval(ms)] <Multicast Address> <Port> "
-	    "<Send String> [<TTL>]", name);
+	fprintf(stderr, "Usage: %s [-i interval(ms)] <Multicast Address> "
+	    "<Port> <Send String> [<TTL>]", name);
+	exit(1);
 }
 
 int
@@ -51,6 +52,7 @@ main(int argc, char *argv[])
 	int result;
 	unsigned long interval = 3000;
 	const char *errmsg;
+	char *progname;
 	char *multicastIP;            /* Arg: IP Multicast address */
 	char *multicastPort;          /* Arg: Server port */
 	char *sendString;             /* Arg: String to multicast */
@@ -59,21 +61,21 @@ main(int argc, char *argv[])
 	struct addrinfo* multicastAddr;          /* Multicast address */
 	struct addrinfo hints = { 0 }; /* Hints for name lookup */
 
+	progname = argv[0];
 	while ((ch = getopt(argc, argv, "i:")) != -1) {
 		switch (ch) {
 		case 'i':
 			interval = atoi(optarg);
 			break;
 		default:
-			usage(argv[0]);
+			usage(progname);
 		}
 	}
 	argc -= optind;
 	argv += optind;
 
 	if (argc < 3 || argc > 4)
-		errx(2, "Usage: %s <Multicast Address> <Port> <Send String>"
-		    " [<TTL>]", argv[0]);
+		usage(progname);
 
 	multicastIP = argv[0]; /* First arg:   multicast IP address */
 	multicastPort = argv[1]; /* Second arg:  multicast port */

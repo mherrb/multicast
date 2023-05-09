@@ -37,8 +37,8 @@
 void
 usage(const char *name)
 {
-	fprintf(stderr, "Usage: %s [-i interval] <Multicast IP> "
-	    "<Multicast Port>", name);
+	fprintf(stderr, "Usage: %s <Multicast IP> "
+	    "<Multicast Port>\n", name);
 	exit(1);
 }
 

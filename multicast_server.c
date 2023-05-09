@@ -40,7 +40,7 @@ void
 usage(const char *name)
 {
 	fprintf(stderr, "Usage: %s [-i interval(ms)] <Multicast Address> "
-	    "<Port> <Send String> [<TTL>]", name);
+	    "<Port> <Send String> [<TTL>]\n", name);
 	exit(1);
 }
 

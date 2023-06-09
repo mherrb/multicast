@@ -133,6 +133,9 @@ main(int argc, char *argv[])
 		    tv.tv_sec, tv.tv_nsec, sendString);
 		if (sendStringLen < 0)
 			err(2, "asprintf");
+		if (sendStringLen >= 1500)
+			err(2, "message too large %d bytes (max 1500)\n",
+			    sendStringLen);
 		sendStringLen++; /* nul byte */
 		if (sendto(sock, buffer, sendStringLen, 0,
 			multicastAddr->ai_addr, multicastAddr->ai_addrlen)

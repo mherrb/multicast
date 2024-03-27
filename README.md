@@ -1,9 +1,8 @@
-# Measuring latency for multicast transmission 
+# Measuring latency for data transmission 
 
-This is a pair of test programs for multicast data transmission. 
-The server can send a multicast frame at a given rate. Each frame is time-stamped. 
+This is a pair of test programs for unicast or multicast data transmission.  The server can send a frame at a given rate. Each frame is time-stamped. The destination can be either a multicast or single host.
 
-The client listens on the multicast address and prints the received timestamp as well as the sender timestamp from the packet.
+The client listens either on the multicast address or all its unicast addresses and prints the received timestamp as well as the sender timestamp from the packet.
 
 A simple AWK script computes the difference, which can then be plotted over time. 
 
@@ -30,7 +29,7 @@ On the "server" machine, start `mcasts` on an arbitrarily chosen multicast addre
 	
 On the "client" machine, start `mcastc` to listen on the same address and port as above. Pipe the output to the AWK script to compute the differences in transit time and save the result: 
 
-    ./mcastc 224.4.3.2 3000 | awk -f analyse.awk > data.txt
+    ./castc 224.4.3.2 3000 | awk -f analyse.awk > data.txt
 	
 Let this run for a couple of minutes, interrupt the client with Cntrl+C  and plot the results:
 

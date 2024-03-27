@@ -202,7 +202,7 @@ main(int argc, char* argv[])
 		clock_serv_t cclock;
 		mach_timespec_t mts;
 #endif
-		char   recvString[1500];      /* Buffer for received string */
+		char   recvString[65536];      /* Buffer for received string */
 		int    recvStringLen;        /* Length of received string */
 
 		/* Receive a single datagram from the server */

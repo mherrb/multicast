@@ -51,7 +51,6 @@ main(int argc, char *argv[])
 	int ch;
 	int result;
 	unsigned long interval = 3000;
-	const char *errmsg;
 	char *progname;
 	char *multicastIP;            /* Arg: IP Multicast address */
 	char *multicastPort;          /* Arg: Server port */

@@ -7,7 +7,7 @@
  * IPv4 or IPv6, depending on the multicast address given.
  *
  * Usage:
- *     mcastc multicastip port
+ *     mcastc [multicastip] port
  *
  * Examples:
  *     $ mcastc 224.0.22.1 9210
@@ -37,37 +37,27 @@
 void
 usage(const char *name)
 {
-	fprintf(stderr, "Usage: %s <Multicast IP> "
-	    "<Multicast Port>\n", name);
+	fprintf(stderr, "Usage: %s [<Multicast IP>] <Port>\n", name);
 	exit(1);
 }
 
 int
-main(int argc, char* argv[])
+multicastSock(char *multicastIP, char *port)
 {
-	int sock;		/* Socket */
-	int result;
-	char *progname;
-	char *multicastIP;	/* Arg: IP Multicast Address */
-	char *multicastPort;	/* Arg: Port */
 	struct addrinfo *multicastAddr;	/* Multicast Address */
 	struct addrinfo *localAddr;	/* Local address to bind to */
 	struct addrinfo hints = { 0 };	/* Hints for name lookup */
-
-	progname = argv[0];
-	if (argc != 3)
-		usage(progname);
-
-	multicastIP = argv[1];	/* First arg:  Multicast IP address */
-	multicastPort = argv[2]; /* Second arg: Multicast port */
+	int result, sock;
 
 	/* Resolve the multicast group address */
 	hints.ai_family = PF_UNSPEC;
 	hints.ai_flags  = AI_NUMERICHOST;
 	result = getaddrinfo(multicastIP, NULL, &hints, &multicastAddr);
-	if (result != 0)
-		errx(2, "getaddrinfo(%s) failed: %s", multicastIP,
+	if (result != 0) {
+		warnx("getaddrinfo(%s) failed: %s", multicastIP,
 		    gai_strerror(result));
+		return -1;
+	}
 
 	printf("Using %s\n", multicastAddr->ai_family == PF_INET6 ?
 	    "IPv6" : "IPv4");
@@ -77,20 +67,23 @@ main(int argc, char* argv[])
 	hints.ai_family   = multicastAddr->ai_family;
 	hints.ai_socktype = SOCK_DGRAM;
 	hints.ai_flags    = AI_PASSIVE; /* Return an address we can bind to */
-	result = getaddrinfo(NULL, multicastPort, &hints, &localAddr);
-	if (result != 0)
-		errx(2, "getaddrinfo() failed: %s", gai_strerror(result));
+	result = getaddrinfo(NULL, port, &hints, &localAddr);
+	if (result != 0) {
+		warnx("getaddrinfo() failed: %s", gai_strerror(result));
+		return -1;
+	}
 
 	/* Create socket for receiving datagrams */
 	if ((sock = socket(localAddr->ai_family,
 		    localAddr->ai_socktype, 0)) == -1)
-		err(2, "socket() failed");
+		return -1;
 
 	/* Bind to the multicast port */
 	if (bind(sock, localAddr->ai_addr, localAddr->ai_addrlen) != 0)
-		err(2, "bind() failed");
+		return -1;
 
-	/* Join the multicast group. We do this seperately depending on whether we
+	/* Join the multicast group.
+	 * We do this seperately depending on whether we
 	 * are using IPv4 or IPv6.  */
 	if (multicastAddr->ai_family  == PF_INET &&
 	    multicastAddr->ai_addrlen == sizeof(struct sockaddr_in)) {
@@ -109,8 +102,10 @@ main(int argc, char* argv[])
 		/* Join the multicast address */
 		if (setsockopt(sock, IPPROTO_IP, IP_ADD_MEMBERSHIP,
 			(char *)&multicastRequest, sizeof(multicastRequest))
-		    != 0 )
-			err(2, "setsockopt(IP_ADD_MEMBERSHIP) failed");
+		    != 0 ) {
+			warn("setsockopt(IP_ADD_MEMBERSHIP) failed");
+			return -1;
+		}
 	} else if (multicastAddr->ai_family  == PF_INET6 &&
 	    multicastAddr->ai_addrlen == sizeof(struct sockaddr_in6)) {
 		/* IPv6 */
@@ -128,14 +123,78 @@ main(int argc, char* argv[])
 		/* Join the multicast group */
 		if (setsockopt(sock, IPPROTO_IPV6, IPV6_JOIN_GROUP,
 			(char *) &multicastRequest, sizeof(multicastRequest))
-		    != 0)
-			err(2, "setsockopt(IPV6_JOIN_GROUP) failed");
+		    != 0) {
+			warn("setsockopt(IPV6_JOIN_GROUP) failed");
+			return -1;
+		}
 	} else {
-		errx(2, "Neither IPv4 or IPv6");
+		warnx("Neither IPv4 or IPv6");
+		return -1;
 	}
 
 	freeaddrinfo(localAddr);
 	freeaddrinfo(multicastAddr);
+	return sock;
+}
+
+int
+unicastSock(char *port)
+{
+	struct addrinfo *localAddr;	/* Local address to bind to */
+	struct addrinfo hints = { 0 };	/* Hints for name lookup */
+	int result, sock;
+	
+	/* Get a local address to listen to */
+	hints.ai_family   = AF_INET6;
+	hints.ai_socktype = SOCK_DGRAM;
+	hints.ai_flags    = AI_PASSIVE; /* Return an address we can bind to */
+	result = getaddrinfo(NULL, port, &hints, &localAddr);
+	if (result != 0) {
+		warn("getaddrinfo() failed: %s", gai_strerror(result));
+		return -1;
+	}
+
+	/* Create socket for receiving datagrams */
+	if ((sock = socket(localAddr->ai_family,
+		    localAddr->ai_socktype, 0)) == -1) 
+		return -1;
+
+	/* Bind to the  port */
+	if (bind(sock, localAddr->ai_addr, localAddr->ai_addrlen) != 0)
+		return -1;
+
+	freeaddrinfo(localAddr);
+	return(sock);
+}
+
+int
+main(int argc, char* argv[])
+{
+	int sock;		/* Socket */
+	char *progname;
+	char *multicastIP;	/* Arg: IP Multicast Address */
+	char *port;	/* Arg: Port */
+
+	progname = argv[0];
+	switch (argc) {
+	case 2: 
+		multicastIP = NULL;
+		port = argv[1];
+		break;
+	case 3:
+		multicastIP = argv[1];
+		port = argv[2];
+		break;
+	default:
+		usage(progname);
+	}
+
+	if (multicastIP != NULL)
+		sock = multicastSock(multicastIP, port);
+	else
+		sock = unicastSock(port);
+	if (sock == -1)
+		err(2, "socket");
 
 	for (;;) {
 		struct timespec tv;

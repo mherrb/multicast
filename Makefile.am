@@ -1,5 +1,4 @@
-bin_PROGRAMS = mcastc mcasts ucastc
+bin_PROGRAMS = castc mcasts
 
 mcasts_SOURCES = multicast_server.c
-mcastc_SOURCES = multicast_client.c
-ucastc_SOURCES = unicast_client.c
+castc_SOURCES = client.c

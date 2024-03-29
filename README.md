@@ -29,9 +29,9 @@ On the "server" machine, start `mcasts` on an arbitrarily chosen multicast addre
 	
 On the "client" machine, start `mcastc` to listen on the same address and port as above. Pipe the output to the AWK script to compute the differences in transit time and save the result: 
 
-    ./castc 224.4.3.2 3000 | awk -f analyse.awk > data.txt
+    ./castc -t 120 224.4.3.2 3000 | awk -f analyse.awk > data.txt
 	
-Let this run for a couple of minutes, interrupt the client with Cntrl+C  and plot the results:
+This will let it run for 2mn (120s). Then plot the results:
 
 	gnuplot -p gnuplot.cmd
 

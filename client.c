@@ -37,7 +37,7 @@
 void
 usage(const char *name)
 {
-	fprintf(stderr, "Usage: %s [<Multicast IP>] <Port>\n", name);
+	fprintf(stderr, "Usage: %s [-t <n>][<Multicast IP>] <Port>\n", name);
 	exit(1);
 }
 
@@ -170,20 +170,34 @@ unicastSock(char *port)
 int
 main(int argc, char* argv[])
 {
-	int sock;		/* Socket */
+	struct timespec start;
+	int ch, sock, duration = -1;		/* Socket */
 	char *progname;
 	char *multicastIP;	/* Arg: IP Multicast Address */
 	char *port;	/* Arg: Port */
 
 	progname = argv[0];
+	while ((ch = getopt(argc, argv, "t:")) != -1) {
+		switch (ch) {
+		case 't':
+			duration = atoi(optarg);
+			clock_gettime(CLOCK_REALTIME, &start);
+			break;
+		default:
+			usage(progname);
+		}
+	}
+	argc -= optind;
+	argv += optind;
+	printf("%d\n", argc);
 	switch (argc) {
-	case 2: 
+	case 1: 
 		multicastIP = NULL;
-		port = argv[1];
+		port = argv[0];
 		break;
-	case 3:
-		multicastIP = argv[1];
-		port = argv[2];
+	case 2:
+		multicastIP = argv[0];
+		port = argv[1];
 		break;
 	default:
 		usage(progname);
@@ -224,6 +238,8 @@ main(int argc, char* argv[])
 #endif
 		printf("%ld.%09ld %s\n", tv.tv_sec, tv.tv_nsec,
 		    recvString);
+		if (duration > 0 && start.tv_sec + duration < tv.tv_sec)
+			break;
 	}
 
 	/* NOT REACHED */
